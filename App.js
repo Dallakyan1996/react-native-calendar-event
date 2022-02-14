@@ -31,7 +31,7 @@ LocaleConfig.locales['fr'] = {
 LocaleConfig.defaultLocale = 'fr';
 export default function App() {
   const [modalIsVisible, setModalIsVisible] = useState(false)
-  let [currentNote, seteCurrentNote] = useState({})
+  let [currentNote, setCurrentNote] = useState({})
   let [markedDates, setMarkedDates] = useState({})
   let [allNotes, setAllNotes] = useState([])
   const [currentDate, setCurrentDate] = useState("")
@@ -47,7 +47,7 @@ export default function App() {
 
   const handleConfirm = (date) => {
     console.log("A date has been picked: ", date.toString().split(" ")[4]);
-    seteCurrentNote({
+    setCurrentNote({
       ...currentNote,
       time: date.toString().split(" ")[4]
     })
@@ -109,41 +109,41 @@ export default function App() {
           <View style={styles.modalView}>
             <Text style={styles.modalText}>{currentDate}</Text>
             <Input
+              placeholder='Add Header'
+              style={styles.modalInput}
+              onChangeText={(e) => {
+                setCurrentNote({
+                  ...currentNote,
+                  date: currentDate,
+                  header: e
+                })
+              }}
+            />
+            <Input
               placeholder='Add Note'
               style={styles.modalInput}
               onChangeText={(e) => {
-                // console.log(e)
-
-                seteCurrentNote({
+                setCurrentNote({
                   ...currentNote,
                   date: currentDate,
                   note: e
                 })
               }}
             />
-            <Input
-              placeholder='Add Header'
-              style={styles.modalInput}
-            // onChangeText={(e) => {
-            //   // console.log(e)
 
-            //   seteCurrentNote({
-            //     ...currentNote,
-            //     date: currentDate,
-            //     note: e
-            //   })
-            // }}
-            />
             <Pressable
               style={[styles.button, styles.buttonClose]}
               onPress={() => {
-                setAllNotes([...allNotes, currentNote])
+                setAllNotes([...allNotes, {
+                  id: Date.now().toString() + Math.random(),
+                  ...currentNote
+                }])
                 setMarkedDates({
                   ...markedDates,
                   [currentDate]: { selected: false, marked: true }
                 })
                 setModalIsVisible(!modalIsVisible)
-                seteCurrentNote({})
+                setCurrentNote({})
               }}
             >
               <Text style={styles.textStyle}>Add Note</Text>
@@ -160,15 +160,7 @@ export default function App() {
           </View>
         </View>
       </Modal>
-      {/* <Pressable
-        style={[styles.button, styles.buttonClose]}
-        onPress={() => {
-          console.log(markedDates)
-        }}
-      >
-        <Text style={styles.textStyle}>Console</Text>
-      </Pressable> */}
-      <NoteLists currentDate={currentDate} notes={allNotes} />
+      <NoteLists markedDates={markedDates} setNotes={setAllNotes} currentDate={currentDate} notes={allNotes} />
       <View style={styles.addBtnView}>
         <FAB
           // visible={visible}
@@ -177,7 +169,6 @@ export default function App() {
           onPress={() => {
             setModalIsVisible(true)
           }
-
           }
         />
       </View>
